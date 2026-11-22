@@ -13,6 +13,7 @@
 | 4× TT DC gear motors + wheels | M1/M2 = left, M3/M4 = right |
 | SG90 micro servo | `SERVO_1` header = pin D10 |
 | HC-SR04 ultrasonic sensor | Mounted on the servo horn. Trig A0, Echo A1 |
+| 3-row A0–A5 header on the shield (S / 5V / GND, servo-style) | The sensor plugs in with female jumper wires, so there's no soldering. The WiFi bridge uses A2/A3 the same way. |
 | Battery pack | 2× 18650 (7.4 V) recommended → `EXT_PWR`. **USB alone can't run the motors.** |
 
 ## Wiring
@@ -24,10 +25,10 @@
 | Motor 3 (right front) | M3 |
 | Motor 4 (right rear) | M4 |
 | Servo brown / red / orange | SERVO_1 − / +5V / S (D10) |
-| HC-SR04 VCC | 5V |
-| HC-SR04 Trig | A0 |
-| HC-SR04 Echo | A1 |
-| HC-SR04 GND | GND |
+| HC-SR04 VCC | header **5V** row |
+| HC-SR04 Trig | header **A0 S** |
+| HC-SR04 Echo | header **A1 S** |
+| HC-SR04 GND | header **GND** row |
 | Battery + (through switch) / − | EXT_PWR + / − |
 
 **PWR jumper on the shield:**
