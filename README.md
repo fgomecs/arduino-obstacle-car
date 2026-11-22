@@ -10,8 +10,8 @@
 |---|---|
 | Arduino Uno R3 (genuine, VID 2341 / PID 0043) | Board: **Arduino Uno** in the IDE (not Mega) |
 | MII Electronics "motor control shield for Arduino" (Adafruit Motor Shield v1 clone, 2× L293D) | Stacked on the Uno. Has 2 servo headers (SERVO_1 = D10, SERVO_2 = D9) |
-| 4× TT DC gear motors + wheels | M1/M2 = left, M3/M4 = right |
-| SG90 micro servo | `SERVO_1` header = pin D10 |
+| 4× TT DC gear motors + wheels | M1 left rear, M2 right rear, M3 right front, M4 left front (left side = M1+M4, right side = M2+M3). Check yours with `motor_test/` |
+| SG90 micro servo | Plugged into the header labeled SERVO_2, which is **pin D10** on this clone |
 | HC-SR04 ultrasonic sensor | Mounted on the servo horn. Trig A0, Echo A1 |
 | Small A0–A5 header board, stacked on the shield (S / 5V / GND rows, servo-style) | The sensor plugs in with female jumper wires, so there's no soldering. |
 | NodeMCU ESP8266 (ESP-12E, CP2102 USB) | v3 WiFi bridge, on the free SER1 servo header. Windows needs the Silicon Labs CP210x driver to see its COM port. |
@@ -21,11 +21,11 @@
 
 | From | To |
 |---|---|
-| Motor 1 (left front) | M1 |
-| Motor 2 (left rear) | M2 |
-| Motor 3 (right front) | M3 |
-| Motor 4 (right rear) | M4 |
-| Servo brown / red / orange | SERVO_1 − / +5V / S (D10) |
+| Left **rear** wheel | M1 |
+| Right **rear** wheel | M2 |
+| Right **front** wheel | M3 |
+| Left **front** wheel | M4 |
+| Servo brown / red / orange | servo header − / +5V / S (D10) |
 | HC-SR04 VCC | header **5V** row |
 | HC-SR04 Trig | header **A0 S** |
 | HC-SR04 Echo | header **A1 S** |
@@ -84,17 +84,15 @@ Two sketches:
 - `esp8266_bridge/` goes on the **NodeMCU**. It handles WiFi setup, the phone web page, and over-the-air updates.
 
 ### Extra wiring (no soldering)
-The servo is on the **SERVO_2** header. The NodeMCU uses the free **SER1** header next to it, with 3 female-to-female jumpers:
+The servo is plugged into the header labeled **SERVO_2**, and the NodeMCU uses the free **SER1** header next to it. On this clone the labels don't match the usual pins: **SERVO_2 = D10, SER1 = D9** (`SWAP_SERVO_PINS 1`).
 
 | NodeMCU | SER1 header |
 |---|---|
-| **D6** (bottom row) | **S** |
+| **D6 / GPIO12** (bottom row) | **S** (Uno D9) |
 | **Vin** (top row) | **+** (5 V) |
 | **GND** (top row) | **−** |
 
-**Check the servo pin:** on power-up the sensor head wiggles left and right, and the Serial Monitor prints `Servo on D9, WiFi bridge on D10`.
-- If the head **doesn't move**, this shield has the two headers' pins swapped. Set `SWAP_SERVO_PINS 1` at the top of `obstacle_car_v3_wifi.ino` and upload again.
-- The standard layout for this shield design is SERVO_2 = D9, SER1 = D10.
+**Check the servo pin:** on power-up the sensor head wiggles left and right, and the Serial Monitor (9600) prints `Servo on D10, WiFi bridge on D9`. If the head doesn't move, flip `SWAP_SERVO_PINS` and upload again.
 
 **Optional return wire** (shows distance and mode on the phone): Uno **A3** → **1 kΩ** → NodeMCU **D5**, plus **2 kΩ** from D5 to GND. Without it, driving works and the page shows "connected · no feedback wire".
 
@@ -137,6 +135,8 @@ The servo is on the **SERVO_2** header. The NodeMCU uses the free **SER1** heade
 | Serial prints one line, then freezes or resets | Motors running on USB power → brown-out. Connect the battery, or use manual mode at the PC. |
 | Upload fails | Board set to Mega. Choose **Arduino Uno**. |
 | One wheel spins backwards | Swap that motor's 2 wires on its M terminal. |
+| Car won't turn, front and rear wheels fight | Motor terminals aren't left/right pairs. Run `motor_test/` and fix the 4 `AF_DCMotor` lines (this car: left = M1+M4, right = M2+M3). |
+| Servo doesn't move / phone commands ignored | Servo and bridge pins swapped. Flip `SWAP_SERVO_PINS`. |
 | Car over- or under-turns | Adjust `TURN_MS`. |
 | Stops for no reason | Sensor angled down at the floor, or loose Trig/Echo wires. |
 

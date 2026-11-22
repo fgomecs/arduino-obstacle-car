@@ -13,10 +13,11 @@
 // Status line to the bridge every 300 ms:  S,<A|M>,<F|B|T|X>,<cm>
 //   mode A=auto M=manual, motion F=fwd B=back T=turning X=stopped, distance in cm
 //
-// Wiring, no soldering: the servo is on the SERVO_2 header, the NodeMCU uses the free SER1 header.
+// Wiring, no soldering: the servo is on the SERVO_2 header (pin D10 on this clone), the NodeMCU
+// uses the free SER1 header (pin D9 on this clone).
 //   SER1  S  -> NodeMCU D6        SER1  +  -> NodeMCU Vin        SER1  -  -> NodeMCU GND
 // On power-up the sensor head wiggles left-right. If it does NOT move, your shield has the
-// two headers' pins swapped: set SWAP_SERVO_PINS to 1 below and upload again.
+// two headers' pins the other way round: flip SWAP_SERVO_PINS (1 <-> 0) below and upload again.
 // Optional return wire (distance/mode on the phone): A3 -> 1k -> NodeMCU D5, 2k from D5 to GND.
 
 #include <AFMotor.h>
@@ -27,7 +28,7 @@
 // ---------- Pins / hardware ----------
 #define TRIG_PIN      A0
 #define ECHO_PIN      A1
-#define SWAP_SERVO_PINS 0     // 0 = standard labels (SERVO_2 = D9, SER1 = D10). 1 = swapped.
+#define SWAP_SERVO_PINS 1     // 1 = this car (servo header = D10, NodeMCU header = D9). 0 = standard labels.
 #if SWAP_SERVO_PINS
 #define SERVO_PIN     10
 #define BRIDGE_RX     9
@@ -56,10 +57,12 @@
 #define LOOK_LEFT     144
 
 NewPing sonar(TRIG_PIN, ECHO_PIN, MAX_DISTANCE);
-AF_DCMotor leftMotor1(1, MOTOR12_1KHZ);
-AF_DCMotor leftMotor2(2, MOTOR12_1KHZ);
-AF_DCMotor rightMotor1(3, MOTOR34_1KHZ);
-AF_DCMotor rightMotor2(4, MOTOR34_1KHZ);
+// Motor terminals on this car (checked with motor_test): M1 = left rear, M2 = right rear,
+// M3 = right front, M4 = left front. So LEFT side = M1 + M4, RIGHT side = M2 + M3.
+AF_DCMotor leftMotor1(1, MOTOR12_1KHZ);    // M1 left rear
+AF_DCMotor leftMotor2(4, MOTOR34_1KHZ);    // M4 left front
+AF_DCMotor rightMotor1(2, MOTOR12_1KHZ);   // M2 right rear
+AF_DCMotor rightMotor2(3, MOTOR34_1KHZ);   // M3 right front
 Servo eyes;
 SoftwareSerial bridge(BRIDGE_RX, BRIDGE_TX);
 
@@ -226,7 +229,7 @@ void setup() {
   bridge.begin(9600);
   eyes.attach(SERVO_PIN);
   moveStop();
-  // Boot wiggle: proves the servo pin is right (no movement -> set SWAP_SERVO_PINS 1)
+  // Boot wiggle: proves the servo pin is right (no movement -> flip SWAP_SERVO_PINS)
   eyes.write(60);  delay(350);
   eyes.write(120); delay(450);
   eyes.write(LOOK_CENTER);

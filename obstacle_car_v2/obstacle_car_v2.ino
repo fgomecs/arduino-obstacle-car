@@ -38,10 +38,12 @@
 #define LOOK_LEFT     144
 
 NewPing sonar(TRIG_PIN, ECHO_PIN, MAX_DISTANCE);
-AF_DCMotor leftMotor1(1, MOTOR12_1KHZ);
-AF_DCMotor leftMotor2(2, MOTOR12_1KHZ);
-AF_DCMotor rightMotor1(3, MOTOR34_1KHZ);
-AF_DCMotor rightMotor2(4, MOTOR34_1KHZ);
+// Motor terminals on this car (checked with motor_test): M1 = left rear, M2 = right rear,
+// M3 = right front, M4 = left front. So LEFT side = M1 + M4, RIGHT side = M2 + M3.
+AF_DCMotor leftMotor1(1, MOTOR12_1KHZ);    // M1 left rear
+AF_DCMotor leftMotor2(4, MOTOR34_1KHZ);    // M4 left front
+AF_DCMotor rightMotor1(2, MOTOR12_1KHZ);   // M2 right rear
+AF_DCMotor rightMotor2(3, MOTOR34_1KHZ);   // M3 right front
 Servo eyes;
 
 enum Motion { STOPPED, FWD, BACK, SPIN };

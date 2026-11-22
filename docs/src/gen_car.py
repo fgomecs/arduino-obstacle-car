@@ -39,7 +39,7 @@ for lab, y in (("M3", 380), ("M3", 405), ("M4", 585), ("M4", 610)):
 # servo header (top edge): GND, +5V, signal (D10)
 for lab, x in (("−", 880), ("+5V", 905), ("S", 930)):
     edge_pin(x, Y0, lab, "top")
-s.text(905, Y0 + 44, "SERVO_1 (D10)", 11, "#cfe0f5", "middle")
+s.text(905, Y0 + 44, "servo header (D10)", 11, "#cfe0f5", "middle")
 # A0-A5 3-row header on the shield (signal / 5V / GND), servo-style: sensor plugs in with female jumpers
 COLS = {f"A{i}": 780 + i * 30 for i in range(6)}
 HS, H5, HG = 575, 600, 625
@@ -67,10 +67,10 @@ def motor(x, y, name, sub):
     s.text(x + 80, y - 10, name, 14, "#222", "middle", "bold")
     s.text(x + 80, y + 108, sub, 12, "#555", "middle")
 
-motor(140, 330, "Motor 1 → M1", "left front")
-motor(140, 555, "Motor 2 → M2", "left rear")
-motor(1200, 330, "Motor 3 → M3", "right front")
-motor(1200, 555, "Motor 4 → M4", "right rear")
+motor(140, 330, "M1", "left REAR wheel")
+motor(140, 555, "M2", "right REAR wheel")
+motor(1200, 330, "M3", "right FRONT wheel")
+motor(1200, 555, "M4", "left FRONT wheel")
 
 s.wire([(300, 360), (400, 360), (400, 380), (X0, 380)], "red")
 s.wire([(300, 395), (380, 395), (380, 405), (X0, 405)], "black")
@@ -122,7 +122,7 @@ s.text(569, 800, "switch", 11, "#333", "middle")
 s.wire([(610, 830), (610, Y0 + BH)], "black", 5)
 
 s.legend_box(1020, 700, 450, [
-    "• Motor pins from code: M1/M2 = left side, M3/M4 = right side.",
+    "• Wheels: M1 left rear, M2 right rear, M3 right front, M4 left front (left = M1+M4, right = M2+M3).",
     "• Sensor plugs into the stacked A0–A5 header board (S/5V/GND).",
     "• Sensor: Trig A0, Echo A1 (NewPing). Servo on SERVO_1 = D10.",
     "• USB alone can NOT run the motors (brown-out / freeze).",
