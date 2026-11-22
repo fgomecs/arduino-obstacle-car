@@ -13,8 +13,8 @@ s.rect(X0 + 150, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)            
 s.rect(X0 + 250, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)
 s.text(X0 + 190, Y0 + 150, "L293D", 11, "#ddd", "middle")
 s.text(X0 + 290, Y0 + 150, "L293D", 11, "#ddd", "middle")
-s.text(X0 + BW / 2, Y0 + 190, "Adafruit Motor Shield v1", 16, "#fff", "middle", "bold")
-s.text(X0 + BW / 2, Y0 + 209, "stacked on Arduino Uno R3", 13, "#cfe0f5", "middle")
+s.text(X0 + BW / 2, Y0 + 180, "Adafruit Motor Shield v1", 16, "#fff", "middle", "bold")
+s.text(X0 + BW / 2, Y0 + 199, "stacked on Arduino Uno R3", 13, "#cfe0f5", "middle")
 s.rect(X0 + 40, Y0 + 245, 50, 22, fill="#222", stroke="#000", rx=2)
 s.text(X0 + 65, Y0 + 237, "PWR jumper", 11, "#fff", "middle")
 s.rect(X0 + 40, Y0 - 22, 44, 30, fill="#cfcfcf", stroke="#555", rx=3)                   # USB-B on Uno
@@ -43,14 +43,16 @@ s.text(905, Y0 + 44, "SERVO_1 (D10)", 11, "#cfe0f5", "middle")
 # A0-A5 3-row header on the shield (signal / 5V / GND), servo-style: sensor plugs in with female jumpers
 COLS = {f"A{i}": 780 + i * 30 for i in range(6)}
 HS, H5, HG = 575, 600, 625
-s.rect(752, 556, 196, 86, fill="#122a4a", stroke="#0a1a30", sw=1.5, rx=6)
+s.rect(686, 548, 270, 100, fill="#00000055", stroke="none", sw=0, rx=8)
+s.rect(680, 542, 270, 100, fill="#2a2f3a", stroke="#000", sw=2, rx=8)
+s.lines(712, 580, ["header", "board", "(stacked)"], 10, "#cfe0f5", gap=14, anchor="middle", weight="bold")
 s.text(850, 653 - 2, "", 1)
 for i, (k, x) in enumerate(COLS.items()):
-    s.text(x, 552, k, 10, "#fff", "middle", "bold")
+    s.text(x, 557, k, 10, "#fff", "middle", "bold")
     for yy, f in ((HS, "#d4af37"), (H5, "#d62828"), (HG, "#222")):
         s.rect(x - 7, yy - 7, 14, 14, fill=f, stroke="#000", sw=1, rx=2)
 for lab, yy in (("S", HS), ("5V", H5), ("G", HG)):
-    s.text(745, yy + 4, lab, 10, "#cfe0f5", "end")
+    s.text(764, yy + 4, lab, 10, "#cfe0f5", "end")
 
 # external power terminal (bottom edge)
 for lab, x in (("+", 580), ("−", 610)):
@@ -153,7 +155,7 @@ s.wire([(COLS["A2"], HS), (COLS["A2"], 692), (1215, 692), (1215, 815), (NP["D6"]
 
 s.legend_box(40, 1000, 1420, [
     "• Motors M1/M2 = left, M3/M4 = right. Sensor Trig A0, Echo A1 (NewPing). Servo on SERVO_1 = D10.",
-    "• Everything plugs into the shield's A0–A5 3-row header (S = signal / 5V / GND) with female jumpers, no soldering.",
+    "• Everything plugs into the small A0–A5 header board stacked on the shield (S = signal / 5V / GND) with female jumpers.",
     "• WiFi bridge: Uno A2 (RX) ← NodeMCU D6 (3.3 V is fine). Uno A3 (TX, 5 V) → 1kΩ → D5, with 2kΩ from D5 to GND (keeps D5 at ~3.3 V).",
     "• NodeMCU Vin ← Uno 5V, GND ↔ GND. Upload to the NodeMCU over its own USB; it can stay wired to the Uno.",
     "• USB alone can NOT run the motors. PWR jumper ON: battery powers motors + Uno (+ NodeMCU).",
