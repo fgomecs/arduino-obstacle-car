@@ -9,7 +9,7 @@
 | Part | Notes |
 |---|---|
 | Arduino Uno R3 (genuine, VID 2341 / PID 0043) | Board: **Arduino Uno** in the IDE (not Mega) |
-| Adafruit Motor Shield v1 (L293D) | Stacked on the Uno |
+| MII Electronics "motor control shield for Arduino" (Adafruit Motor Shield v1 clone, 2× L293D) | Stacked on the Uno. Has 2 servo headers (SERVO_1 = D10, SERVO_2 = D9) |
 | 4× TT DC gear motors + wheels | M1/M2 = left, M3/M4 = right |
 | SG90 micro servo | `SERVO_1` header = pin D10 |
 | HC-SR04 ultrasonic sensor | Mounted on the servo horn. Trig A0, Echo A1 |
