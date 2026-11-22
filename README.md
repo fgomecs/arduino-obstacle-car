@@ -13,7 +13,7 @@
 | 4× TT DC gear motors + wheels | M1/M2 = left, M3/M4 = right |
 | SG90 micro servo | `SERVO_1` header = pin D10 |
 | HC-SR04 ultrasonic sensor | Mounted on the servo horn. Trig A0, Echo A1 |
-| Small A0–A5 header board, stacked on the shield (S / 5V / GND rows, servo-style) | The sensor plugs in with female jumper wires, so there's no soldering. The WiFi bridge uses A2/A3 the same way. |
+| Small A0–A5 header board, stacked on the shield (S / 5V / GND rows, servo-style) | The sensor plugs in with female jumper wires, so there's no soldering. |
 | Battery pack | 2× 18650 (7.4 V) recommended → `EXT_PWR`. **USB alone can't run the motors.** |
 
 ## Wiring
@@ -137,5 +137,5 @@ If the servo stops sweeping after you plug in the NodeMCU, the two headers are s
 An ESP32 (about $10) acts as a WiFi bridge:
 - It hosts a phone web page: drive pad, auto/manual toggle, live distance readout.
 - It uses WiFiManager: if the home WiFi changes, join the car's own setup hotspot from a phone and pick the new network. No reflashing.
-- It sends the same one-letter commands to the Uno over SoftwareSerial on the free pins A2/A3.
+- It sends the same one-letter commands to the Uno over SoftwareSerial on D9 (the spare SERVO_2 header).
 - The Uno TX → ESP32 RX line needs a 5 V → 3.3 V divider.
