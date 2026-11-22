@@ -69,6 +69,44 @@ Auto mode prints `DIST <cm>` twice a second and `SCAN L=.. R=..` on each avoidan
 | `TURN_MS` / `TURNAROUND_MS` | 1500 / 1700 | spin time; lower it if the car over-turns |
 | `BACKUP_MS` | 300 | how long it reverses before scanning |
 
+## v3: WiFi phone remote (NodeMCU ESP8266)
+
+| Driving (holding ▲) | Auto mode |
+|---|---|
+| <img src="docs/screenshots/remote-driving.png" width="260"> | <img src="docs/screenshots/remote-auto.png" width="260"> |
+
+![Wiring with WiFi bridge](docs/wiring-wifi.png)
+
+Two sketches:
+- `obstacle_car_v3_wifi/` goes on the **Uno**. It's v2 plus a second serial link on A2/A3, a status line for the phone, and a safety stop.
+- `esp8266_bridge/` goes on the **NodeMCU**. It handles WiFi setup, the phone web page, and over-the-air updates.
+
+### Extra wiring
+| From | To |
+|---|---|
+| NodeMCU **D6** | Uno **A2** (direct) |
+| Uno **A3** | **1 kΩ** → NodeMCU **D5**, plus **2 kΩ** from D5 to GND (5 V → 3.3 V) |
+| NodeMCU **Vin** | Uno **5V** |
+| NodeMCU **GND** | Uno **GND** |
+
+### Setting up the NodeMCU (once)
+1. Arduino IDE → File → Preferences → Additional Boards Manager URLs: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
+2. Tools → Board → Boards Manager → install **esp8266**. Then Library Manager → install **WiFiManager** (by tzapu).
+3. Tools → Board → **NodeMCU 1.0 (ESP-12E Module)**. Plug in the NodeMCU's own USB (CP2102 chip) and upload `esp8266_bridge.ino`.
+4. On your phone, join WiFi **TiagoCar-Setup**. A page opens: pick your home WiFi and enter the password.
+5. Open **http://tiagocar.local**, or the IP address the Serial Monitor shows at 115200 baud.
+
+### Using it
+- **Hold** an arrow to drive. **Let go** and it stops. The page repeats the command every 150 ms, and the Uno stops if commands stop arriving for 600 ms (finger lifted, phone locked, WiFi dropped).
+- It won't drive forward into anything closer than 30 cm.
+- **Keyboard** (PC, TV, or a mini wireless keyboard): arrows/WASD drive, Space/Enter stop, `1` auto, `2` manual.
+- **Change WiFi:** hold the NodeMCU's **FLASH** button for 3 s, or tap *Change WiFi* on the page. It reopens the setup hotspot.
+- **Update the NodeMCU without USB:** Arduino IDE → Tools → Port → `tiagocar at …`. The password is `tiagocar` (set in the sketch).
+
+### Bridge protocol
+- Phone → NodeMCU → Uno: one character (`a m f b l r s`).
+- Uno → NodeMCU every 300 ms: `S,<A|M>,<F|B|T|X>,<cm>`. The NodeMCU serves this to the page as JSON at `/status`.
+
 ## v1 → v2 changes
 
 `v1_original/` keeps the first sketch unchanged. v2 fixes:
@@ -88,7 +126,7 @@ Auto mode prints `DIST <cm>` twice a second and `SCAN L=.. R=..` on each avoidan
 | Car over- or under-turns | Adjust `TURN_MS`. |
 | Stops for no reason | Sensor angled down at the floor, or loose Trig/Echo wires. |
 
-## Roadmap: WiFi + phone control
+## Roadmap (done in v3)
 
 An ESP32 (about $10) acts as a WiFi bridge:
 - It hosts a phone web page: drive pad, auto/manual toggle, live distance readout.
