@@ -111,9 +111,9 @@ The servo is on the **SERVO_2** header. The NodeMCU uses the free **SER1** heade
 - **Change WiFi:** hold the NodeMCU's **FLASH** button for 3 s, or tap *Change WiFi* on the page. It reopens the setup hotspot.
 - **Update the NodeMCU without USB:** Arduino IDE → Tools → Port → `tiagocar at …`. The password is `tiagocar` (set in the sketch).
 
-### WiFi troubleshooting (what fixed it on our ASUS mesh)
+### WiFi troubleshooting (what fixed it on our ASUS mesh: lower TX power)
 - **Reboots while connecting** (`rl` / garbage in the Serial Monitor): power dips when the radio transmits. The sketch sets `WiFi.setOutputPower(10)`, which fixes it. On the car, the battery supplies 5 V through the shield.
-- **"Connect to new AP Failed" / disconnect reason 2 (AUTH_EXPIRE):** ASUS Tri-Band Smart Connect / AiMesh rejects the ESP8266. Fix: create a **2.4 GHz-only guest/IoT network** in the ASUS app (WPA2-Personal, simple password, **Access Intranet ON**) and pick that network on the TiagoCar-Setup page.
+- **"Connect to new AP Failed" / disconnect reason 2 (AUTH_EXPIRE):** on our ASUS mesh this went away once TX power was lowered, with **802.11ax mode** turned off on the router. If it ever comes back: create a **2.4 GHz-only guest/IoT network** in the ASUS app (WPA2-Personal, **Access Intranet ON**) and pick that one on the TiagoCar-Setup page.
 - The ESP8266 only does **2.4 GHz** and **WPA2** (no WPA3-only networks).
 
 ### Bridge protocol
