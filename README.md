@@ -14,6 +14,7 @@
 | SG90 micro servo | `SERVO_1` header = pin D10 |
 | HC-SR04 ultrasonic sensor | Mounted on the servo horn. Trig A0, Echo A1 |
 | Small A0–A5 header board, stacked on the shield (S / 5V / GND rows, servo-style) | The sensor plugs in with female jumper wires, so there's no soldering. |
+| NodeMCU ESP8266 (ESP-12E, CP2102 USB) | v3 WiFi bridge, on the free SER1 servo header. Windows needs the Silicon Labs CP210x driver to see its COM port. |
 | Battery pack | 2× 18650 (7.4 V) recommended → `EXT_PWR`. **USB alone can't run the motors.** |
 
 ## Wiring
@@ -70,7 +71,7 @@ Auto mode prints `DIST <cm>` twice a second and `SCAN L=.. R=..` on each avoidan
 | `TURN_MS` / `TURNAROUND_MS` | 1500 / 1700 | spin time; lower it if the car over-turns |
 | `BACKUP_MS` | 300 | how long it reverses before scanning |
 
-## v3: WiFi phone remote (NodeMCU ESP8266)
+## v3: WiFi phone remote (NodeMCU ESP8266) ✅ tested
 
 | Driving (holding ▲) | Auto mode |
 |---|---|
