@@ -1,0 +1,97 @@
+# 🚗 Arduino Obstacle-Avoiding Car
+
+4-wheel robot car that drives on its own, scans with an ultrasonic sensor on a servo, and turns toward the most open direction. It can also be driven by hand over the serial port. Those same commands are what a future WiFi bridge will send.
+
+![Wiring diagram](docs/wiring.png)
+
+## Hardware
+
+| Part | Notes |
+|---|---|
+| Arduino Uno R3 (genuine, VID 2341 / PID 0043) | Board: **Arduino Uno** in the IDE (not Mega) |
+| Adafruit Motor Shield v1 (L293D) | Stacked on the Uno |
+| 4× TT DC gear motors + wheels | M1/M2 = left, M3/M4 = right |
+| SG90 micro servo | `SERVO_1` header = pin D10 |
+| HC-SR04 ultrasonic sensor | Mounted on the servo horn. Trig A0, Echo A1 |
+| Battery pack | 2× 18650 (7.4 V) recommended → `EXT_PWR`. **USB alone can't run the motors.** |
+
+## Wiring
+
+| From | To |
+|---|---|
+| Motor 1 (left front) | M1 |
+| Motor 2 (left rear) | M2 |
+| Motor 3 (right front) | M3 |
+| Motor 4 (right rear) | M4 |
+| Servo brown / red / orange | SERVO_1 − / +5V / S (D10) |
+| HC-SR04 VCC | 5V |
+| HC-SR04 Trig | A0 |
+| HC-SR04 Echo | A1 |
+| HC-SR04 GND | GND |
+| Battery + (through switch) / − | EXT_PWR + / − |
+
+**PWR jumper on the shield:**
+- **ON:** the battery powers the motors and the Uno.
+- **OFF:** the Uno runs from USB and the motors run only from the battery. This is the safest setup for testing at the PC.
+
+The diagram is generated from code: `cd docs/src && python3 gen_car.py ../wiring.svg && rsvg-convert -w 1500 ../wiring.svg -o ../wiring.png`
+
+## Software
+
+**Libraries** (Arduino IDE → Sketch → Include Library → Manage Libraries):
+- `Adafruit Motor Shield library` (the **V1** one, AFMotor)
+- `NewPing`
+- `Servo` (built in)
+
+**Upload:** open `obstacle_car_v2/obstacle_car_v2.ino`, select Tools → Board → **Arduino Uno**, pick the COM port, and click Upload.
+A correct build reports about **5.8 KB of flash and 263 bytes of RAM**. If RAM shows about 120 bytes, you uploaded v1.
+
+### Serial control (9600 baud)
+
+| Key | Action |
+|---|---|
+| `a` | auto mode (drive + avoid obstacles) |
+| `m` | manual mode (stops) |
+| `f` / `b` | forward / back (manual) |
+| `l` / `r` | short spin left / right (manual) |
+| `s` | stop (switches to manual) |
+
+Auto mode prints `DIST <cm>` twice a second and `SCAN L=.. R=..` on each avoidance. Manual mode refuses to drive forward into anything closer than 30 cm and prints `BLOCKED`.
+
+`bool autoMode = true;` makes the car drive on its own 2 s after power-on. Set it to `false` for bench testing so it waits for commands.
+
+### Tuning (top of the sketch)
+
+| Constant | Default | What it does |
+|---|---|---|
+| `CRUISE_SPEED` / `SLOW_SPEED` | 150 / 100 | motor PWM (0–255) |
+| `COLL_DIST` / `SLOW_DIST` | 30 / 60 cm | stop-and-scan / slow-down distance |
+| `TURN_MS` / `TURNAROUND_MS` | 1500 / 1700 | spin time; lower it if the car over-turns |
+| `BACKUP_MS` | 300 | how long it reverses before scanning |
+
+## v1 → v2 changes
+
+`v1_original/` keeps the first sketch unchanged. v2 fixes:
+1. **Stutter:** v1 brought the speed up from 0 on every loop pass, so the car kept slowing down and speeding up. v2 only does that when starting from a stop.
+2. **False stops:** a no-echo reading (0 cm) counted as "wall". v2 treats it as open road and takes the median of 3 pings.
+3. **Blind driving:** v1 went about 600 ms between sensor readings. v2 reads continuously.
+4. **Never reversed:** v2 backs up before scanning, slows down near objects, and turns around when boxed in.
+5. **Serial control** added, ready for a WiFi bridge.
+
+## Troubleshooting
+
+| Symptom | Cause / fix |
+|---|---|
+| Serial prints one line, then freezes or resets | Motors running on USB power → brown-out. Connect the battery, or use manual mode at the PC. |
+| Upload fails | Board set to Mega. Choose **Arduino Uno**. |
+| One wheel spins backwards | Swap that motor's 2 wires on its M terminal. |
+| Car over- or under-turns | Adjust `TURN_MS`. |
+| Stops for no reason | Sensor angled down at the floor, or loose Trig/Echo wires. |
+
+## Roadmap: WiFi + phone control
+
+An ESP32 (about $10) acts as a WiFi bridge:
+- It hosts a phone web page: drive pad, auto/manual toggle, live distance readout.
+- It uses WiFiManager: if the home WiFi changes, join the car's own setup hotspot from a phone and pick the new network. No reflashing.
+- It sends the same one-letter commands to the Uno over SoftwareSerial on the free pins A2/A3.
+- The Uno TX → ESP32 RX line needs a 5 V → 3.3 V divider.
