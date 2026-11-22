@@ -39,10 +39,10 @@ for lab, y in (("M3", 380), ("M3", 405), ("M4", 585), ("M4", 610)):
 # servo header (top edge): GND, +5V, signal (D10)
 for lab, x in (("−", 880), ("+5V", 905), ("S", 930)):
     edge_pin(x, Y0, lab, "top")
-s.text(905, Y0 + 44, "SERVO_2 (D9)", 11, "#cfe0f5", "middle")
+s.text(905, Y0 + 44, "SERVO_2 (D10)", 11, "#cfe0f5", "middle")
 for lab, x in (("−", 790), ("+5V", 815), ("S", 840)):
     edge_pin(x, Y0, lab, "top")
-s.text(815, Y0 + 44, "SER1 (D10)", 11, "#cfe0f5", "middle")
+s.text(815, Y0 + 44, "SER1 (D9)", 11, "#cfe0f5", "middle")
 # A0-A5 3-row header on the shield (signal / 5V / GND), servo-style: sensor plugs in with female jumpers
 COLS = {f"A{i}": 780 + i * 30 for i in range(6)}
 HS, H5, HG = 575, 600, 625
@@ -70,10 +70,10 @@ def motor(x, y, name, sub):
     s.text(x + 80, y - 10, name, 14, "#222", "middle", "bold")
     s.text(x + 80, y + 108, sub, 12, "#555", "middle")
 
-motor(140, 330, "Motor 1 → M1", "left front")
-motor(140, 555, "Motor 2 → M2", "left rear")
-motor(1200, 330, "Motor 3 → M3", "right front")
-motor(1200, 555, "Motor 4 → M4", "right rear")
+motor(140, 330, "M1", "left REAR wheel")
+motor(140, 555, "M2", "right REAR wheel")
+motor(1200, 330, "M3", "right FRONT wheel")
+motor(1200, 555, "M4", "left FRONT wheel")
 
 s.wire([(300, 360), (400, 360), (400, 380), (X0, 380)], "red")
 s.wire([(300, 395), (380, 395), (380, 405), (X0, 405)], "black")
@@ -155,8 +155,8 @@ s.wire([(NP["Vin"], NY), (NP["Vin"], 830), (1185, 830), (1185, 284), (815, 284),
 s.wire([(NP["GND"], NY), (NP["GND"], 822), (1195, 822), (1195, 260), (790, 260), (790, Y0)], "black", 4, "GND ← SER1 −", (1060, 260))
 
 s.legend_box(40, 1000, 1420, [
-    "• Shield: MII Electronics motor control shield (Adafruit Motor Shield v1 clone). Motors M1/M2 left, M3/M4 right. Servo on SERVO_2 (D9).",
-    "• WiFi bridge, no soldering: 3 female-female jumpers from the NodeMCU to the free SER1 header: D6 → S (Uno D10), Vin → +5V, GND → −. Head doesn't wiggle at boot? set SWAP_SERVO_PINS 1.",
+    "• Shield: MII Electronics motor control shield (Adafruit Motor Shield v1 clone). Wheels: M1 left rear, M2 right rear, M3 right front, M4 left front. Servo on SERVO_2 (= D10 on this clone).",
+    "• WiFi bridge, no soldering: 3 female-female jumpers from the NodeMCU to the free SER1 header: D6 → S (Uno D9 on this clone), Vin → +5V, GND → −. Head doesn't wiggle at boot? flip SWAP_SERVO_PINS.",
     "• Optional return wire (distance + mode on the phone): Uno A3 → 1kΩ → NodeMCU D5, with 2kΩ from D5 to GND (5 V → 3.3 V).",
     "• Sensor plugs into the A0–A5 header (S / 5V / GND). USB alone can NOT run the motors; PWR jumper ON = battery powers everything.",
     "• No 1k/2k? Any 1:2 pair works (10k + 20k, 2.2k + 4.7k). A wheel spins backwards? Swap its 2 wires.",
