@@ -13,10 +13,10 @@ s.rect(X0 + 150, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)            
 s.rect(X0 + 250, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)
 s.text(X0 + 190, Y0 + 150, "L293D", 11, "#ddd", "middle")
 s.text(X0 + 290, Y0 + 150, "L293D", 11, "#ddd", "middle")
-s.text(X0 + BW / 2, Y0 + 205, "Adafruit Motor Shield v1", 16, "#fff", "middle", "bold")
-s.text(X0 + BW / 2, Y0 + 226, "stacked on Arduino Uno R3", 13, "#cfe0f5", "middle")
-s.rect(X0 + 330, Y0 + 260, 50, 22, fill="#222", stroke="#000", rx=2)
-s.text(X0 + 355, Y0 + 252, "PWR jumper", 11, "#fff", "middle")
+s.text(X0 + BW / 2, Y0 + 190, "Adafruit Motor Shield v1", 16, "#fff", "middle", "bold")
+s.text(X0 + BW / 2, Y0 + 209, "stacked on Arduino Uno R3", 13, "#cfe0f5", "middle")
+s.rect(X0 + 40, Y0 + 245, 50, 22, fill="#222", stroke="#000", rx=2)
+s.text(X0 + 65, Y0 + 237, "PWR jumper", 11, "#fff", "middle")
 s.rect(X0 + 40, Y0 - 22, 44, 30, fill="#cfcfcf", stroke="#555", rx=3)                   # USB-B on Uno
 s.text(X0 + 62, Y0 - 30, "USB → PC (upload + Serial 9600)", 11, "#333", "middle")
 
@@ -40,9 +40,18 @@ for lab, y in (("M3", 380), ("M3", 405), ("M4", 585), ("M4", 610)):
 for lab, x in (("−", 880), ("+5V", 905), ("S", 930)):
     edge_pin(x, Y0, lab, "top")
 s.text(905, Y0 + 44, "SERVO_1 (D10)", 11, "#cfe0f5", "middle")
-# analog/power row (bottom edge)
-for lab, x in (("5V", 780), ("GND", 810), ("A0", 840), ("A1", 870)):
-    edge_pin(x, Y0 + BH, lab, "bottom")
+# A0-A5 3-row header on the shield (signal / 5V / GND), servo-style: sensor plugs in with female jumpers
+COLS = {f"A{i}": 780 + i * 30 for i in range(6)}
+HS, H5, HG = 575, 600, 625
+s.rect(752, 556, 196, 86, fill="#122a4a", stroke="#0a1a30", sw=1.5, rx=6)
+s.text(850, 653 - 2, "", 1)
+for i, (k, x) in enumerate(COLS.items()):
+    s.text(x, 552, k, 10, "#fff", "middle", "bold")
+    for yy, f in ((HS, "#d4af37"), (H5, "#d62828"), (HG, "#222")):
+        s.rect(x - 7, yy - 7, 14, 14, fill=f, stroke="#000", sw=1, rx=2)
+for lab, yy in (("S", HS), ("5V", H5), ("G", HG)):
+    s.text(745, yy + 4, lab, 10, "#cfe0f5", "end")
+
 # external power terminal (bottom edge)
 for lab, x in (("+", 580), ("−", 610)):
     edge_pin(x, Y0 + BH, lab, "bottom")
@@ -91,14 +100,14 @@ s.wire([(905, 212), (905, Y0)], "red", 4)
 s.wire([(930, 212), (930, Y0)], "orange", 4)
 
 # HC-SR04 → bottom row, routed around the left side of the board
-s.wire([(610, 180), (610, 250), (470, 250), (470, 705), (780, 705), (780, Y0 + BH)], "red", 4,
-       "VCC → 5V", (520, 705))
-s.wire([(645, 180), (645, 262), (455, 262), (455, 720), (840, 720), (840, Y0 + BH)], "yellow", 4,
-       "Trig → A0", (640, 720))
-s.wire([(680, 180), (680, 274), (440, 274), (440, 735), (870, 735), (870, Y0 + BH)], "green", 4,
-       "Echo → A1", (760, 735))
-s.wire([(715, 180), (715, 286), (425, 286), (425, 750), (810, 750), (810, Y0 + BH)], "black", 4,
-       "GND → GND", (520, 750))
+s.wire([(610, 180), (610, 250), (470, 250), (470, 705), (900, 705), (900, H5)], "red", 4,
+       "VCC → 5V row", (520, 705))
+s.wire([(645, 180), (645, 262), (455, 262), (455, 720), (780, 720), (780, HS)], "yellow", 4,
+       "Trig → A0 S", (640, 720))
+s.wire([(680, 180), (680, 274), (440, 274), (440, 735), (810, 735), (810, HS)], "green", 4,
+       "Echo → A1 S", (700, 735))
+s.wire([(715, 180), (715, 286), (425, 286), (425, 750), (930, 750), (930, HG)], "black", 4,
+       "GND → GND row", (520, 750))
 
 # ---------------- battery ----------------
 s.rect(470, 830, 230, 70, fill="#333", stroke="#000", sw=2, rx=8)
@@ -112,12 +121,13 @@ s.wire([(610, 830), (610, Y0 + BH)], "black", 5)
 
 s.legend_box(1020, 700, 450, [
     "• Motor pins from code: M1/M2 = left side, M3/M4 = right side.",
+    "• Sensor plugs into the A0–A5 header (S / 5V / GND) by jumpers.",
     "• Sensor: Trig A0, Echo A1 (NewPing). Servo on SERVO_1 = D10.",
     "• USB alone can NOT run the motors (brown-out / freeze).",
     "• PWR jumper ON: battery powers motors + Uno.",
     "• PWR jumper OFF: Uno from USB, motors from EXT_PWR only.",
     "• A wheel spins backwards? Swap that motor's 2 wires.",
-    "• Free pins for a WiFi bridge (ESP32): A2/A3 (SoftwareSerial).",
+    "• WiFi bridge (NodeMCU) on A2/A3: see the v3 diagram.",
 ], "Notes")
 
 s.save(sys.argv[1])
