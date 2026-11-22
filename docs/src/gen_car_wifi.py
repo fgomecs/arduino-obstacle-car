@@ -3,7 +3,7 @@ from svglib import SVG
 
 s = SVG(1500, 1180)
 s.title("Obstacle-avoiding car v3 · wiring with WiFi bridge",
-        "Arduino Uno R3 + Adafruit Motor Shield v1 (L293D) · 4 DC motors · SG90 servo · HC-SR04 ultrasonic sensor")
+        "Arduino Uno R3 + MII motor shield (Adafruit v1 clone, L293D) · 4 DC motors · SG90 servo · HC-SR04 · NodeMCU ESP8266")
 
 # ---------------- board (Uno with shield stacked on top) ----------------
 X0, Y0, BW, BH = 520, 330, 460, 330
@@ -13,7 +13,7 @@ s.rect(X0 + 150, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)            
 s.rect(X0 + 250, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)
 s.text(X0 + 190, Y0 + 150, "L293D", 11, "#ddd", "middle")
 s.text(X0 + 290, Y0 + 150, "L293D", 11, "#ddd", "middle")
-s.text(X0 + BW / 2, Y0 + 180, "Adafruit Motor Shield v1", 16, "#fff", "middle", "bold")
+s.text(X0 + BW / 2, Y0 + 180, "MII motor shield (Adafruit v1 clone)", 15, "#fff", "middle", "bold")
 s.text(X0 + BW / 2, Y0 + 199, "stacked on Arduino Uno R3", 13, "#cfe0f5", "middle")
 s.rect(X0 + 40, Y0 + 245, 50, 22, fill="#222", stroke="#000", rx=2)
 s.text(X0 + 65, Y0 + 237, "PWR jumper", 11, "#fff", "middle")
@@ -40,6 +40,9 @@ for lab, y in (("M3", 380), ("M3", 405), ("M4", 585), ("M4", 610)):
 for lab, x in (("−", 880), ("+5V", 905), ("S", 930)):
     edge_pin(x, Y0, lab, "top")
 s.text(905, Y0 + 44, "SERVO_1 (D10)", 11, "#cfe0f5", "middle")
+for lab, x in (("−", 790), ("+5V", 815), ("S", 840)):
+    edge_pin(x, Y0, lab, "top")
+s.text(815, Y0 + 44, "SERVO_2 (D9)", 11, "#cfe0f5", "middle")
 # A0-A5 3-row header on the shield (signal / 5V / GND), servo-style: sensor plugs in with female jumpers
 COLS = {f"A{i}": 780 + i * 30 for i in range(6)}
 HS, H5, HG = 575, 600, 625
@@ -136,30 +139,27 @@ for lab, x in NP.items():
     s.text(x, NY + 24, "GND" if lab == "GND2" else lab, 10, "#fff", "middle")
 
 BY = Y0 + BH
-s.wire([(900, 705), (900, 800), (NP["Vin"], 800), (NP["Vin"], NY)], "red", 4, "5V → Vin", (980, 800))
-s.circle(900, 705, 5, fill="#d62828", stroke="#000", sw=1)
-s.wire([(930, 750), (930, 785), (NP["GND"], 785), (NP["GND"], NY)], "black", 4)
-s.circle(930, 750, 5, fill="#222", stroke="#000", sw=1)
 # Uno A3 (TX, 5 V) -> 1k -> node -> D5 ; node -> 2k -> GND  (5 V -> 3.3 V)
-s.wire([(COLS["A3"], HS), (COLS["A3"], 680), (NP["D5"], 680), (NP["D5"], 715)], "purple", 4, "A3 S (TX) → D5", (1020, 680))
+s.wire([(COLS["A3"], HS), (COLS["A3"], 680), (NP["D5"], 680), (NP["D5"], 715)], "purple", 4, "optional: A3 S → D5 (distance on phone)", (1060, 680))
 s.wire([(NP["D5"], 755), (NP["D5"], NY)], "purple", 4)
 s.rect(NP["D5"] - 8, 715, 16, 40, fill="#e8d4a8", stroke="#7a5a1e", sw=1.5, rx=4)
 s.text(NP["D5"] - 14, 740, "1kΩ", 11, "#333", "end")
 s.wire([(NP["D5"], 770), (NP["GND2"] + 40, 770)], "gray", 3, dots=False)
 s.rect(NP["D5"] + 20, 763, 40, 14, fill="#e8d4a8", stroke="#7a5a1e", sw=1.5, rx=4)
-s.text(NP["D5"] + 40, 795, "2kΩ", 11, "#333", "middle")
+s.text(NP["D5"] + 40, 757, "2kΩ", 11, "#333", "middle")
 s.circle(NP["D5"], 770, 5, fill="#8a3ffc", stroke="#000", sw=1)
 s.wire([(NP["GND2"] + 40, 770), (NP["GND2"] + 40, 820), (NP["GND2"], 820), (NP["GND2"], NY)], "black", 3)
-s.wire([(COLS["A2"], HS), (COLS["A2"], 692), (1215, 692), (1215, 815), (NP["D6"], 815), (NP["D6"], NY)], "cyan", 4,
-       "A2 S (RX) ← D6", (1300, 692))
+
+s.wire([(NP["D6"], NY), (NP["D6"], 308), (840, 308), (840, Y0)], "cyan", 4, "D6 → SERVO_2 S (D9)", (1060, 308))
+s.wire([(NP["Vin"], NY), (NP["Vin"], 830), (1185, 830), (1185, 284), (815, 284), (815, Y0)], "red", 4, "Vin ← SERVO_2 +5V", (1060, 284))
+s.wire([(NP["GND"], NY), (NP["GND"], 822), (1195, 822), (1195, 260), (790, 260), (790, Y0)], "black", 4, "GND ← SERVO_2 −", (1060, 260))
 
 s.legend_box(40, 1000, 1420, [
-    "• Motors M1/M2 = left, M3/M4 = right. Sensor Trig A0, Echo A1 (NewPing). Servo on SERVO_1 = D10.",
-    "• Everything plugs into the small A0–A5 header board stacked on the shield (S = signal / 5V / GND) with female jumpers.",
-    "• WiFi bridge: Uno A2 (RX) ← NodeMCU D6 (3.3 V is fine). Uno A3 (TX, 5 V) → 1kΩ → D5, with 2kΩ from D5 to GND (keeps D5 at ~3.3 V).",
-    "• NodeMCU Vin ← Uno 5V, GND ↔ GND. Upload to the NodeMCU over its own USB; it can stay wired to the Uno.",
-    "• USB alone can NOT run the motors. PWR jumper ON: battery powers motors + Uno (+ NodeMCU).",
-    "• No 1k/2k? Any pair at a 1:2 ratio works (e.g. 10k + 20k, or 2.2k + 4.7k). A wheel spins backwards? Swap its 2 wires.",
+    "• Shield: MII Electronics motor control shield (Adafruit Motor Shield v1 clone). Motors M1/M2 left, M3/M4 right. Servo on SERVO_1 = D10.",
+    "• WiFi bridge, no soldering: 3 female-female jumpers from the NodeMCU to the spare SERVO_2 header: D6 → S (Uno D9), Vin → +5V, GND → −.",
+    "• Optional return wire (distance + mode on the phone): Uno A3 → 1kΩ → NodeMCU D5, with 2kΩ from D5 to GND (5 V → 3.3 V).",
+    "• Sensor plugs into the A0–A5 header (S / 5V / GND). USB alone can NOT run the motors; PWR jumper ON = battery powers everything.",
+    "• No 1k/2k? Any 1:2 pair works (10k + 20k, 2.2k + 4.7k). A wheel spins backwards? Swap its 2 wires.",
 ], "Notes")
 
 s.save(sys.argv[1])

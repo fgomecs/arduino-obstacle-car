@@ -79,16 +79,21 @@ Auto mode prints `DIST <cm>` twice a second and `SCAN L=.. R=..` on each avoidan
 ![Wiring with WiFi bridge](docs/wiring-wifi.png)
 
 Two sketches:
-- `obstacle_car_v3_wifi/` goes on the **Uno**. It's v2 plus a second serial link on A2/A3, a status line for the phone, and a safety stop.
+- `obstacle_car_v3_wifi/` goes on the **Uno**. It's v2 plus a second serial link (commands in on D9 / SERVO_2, optional status out on A3) and a safety stop.
 - `esp8266_bridge/` goes on the **NodeMCU**. It handles WiFi setup, the phone web page, and over-the-air updates.
 
-### Extra wiring
-| From | To |
+### Extra wiring (no soldering)
+Use 3 female-to-female jumpers to the shield's **spare servo header** (the empty one of the two, **SERVO_2 = D9**):
+
+| NodeMCU | SERVO_2 header |
 |---|---|
-| NodeMCU **D6** (bottom row) | header **A2 S** (direct) |
-| header **A3 S** | **1 kΩ** → NodeMCU **D5** (bottom row), plus **2 kΩ** from D5 to GND (5 V → 3.3 V) |
-| NodeMCU **Vin** (top row) | header **5V** row |
-| NodeMCU **GND** (top row) | header **GND** row |
+| **D6** (bottom row) | **S** (Uno D9) |
+| **Vin** (top row) | **+** (5 V) |
+| **GND** (top row) | **−** |
+
+**Optional return wire** (shows distance and mode on the phone): Uno **A3** → **1 kΩ** → NodeMCU **D5**, plus **2 kΩ** from D5 to GND. Without it, driving works and the page shows "connected · no feedback wire".
+
+If the servo stops sweeping after you plug in the NodeMCU, the two headers are swapped on your board. Swap the plugs.
 
 ### Setting up the NodeMCU (once)
 1. Arduino IDE → File → Preferences → Additional Boards Manager URLs: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
