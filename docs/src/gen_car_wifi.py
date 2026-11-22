@@ -13,10 +13,10 @@ s.rect(X0 + 150, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)            
 s.rect(X0 + 250, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)
 s.text(X0 + 190, Y0 + 150, "L293D", 11, "#ddd", "middle")
 s.text(X0 + 290, Y0 + 150, "L293D", 11, "#ddd", "middle")
-s.text(X0 + BW / 2, Y0 + 205, "Adafruit Motor Shield v1", 16, "#fff", "middle", "bold")
-s.text(X0 + BW / 2, Y0 + 226, "stacked on Arduino Uno R3", 13, "#cfe0f5", "middle")
-s.rect(X0 + 330, Y0 + 260, 50, 22, fill="#222", stroke="#000", rx=2)
-s.text(X0 + 355, Y0 + 252, "PWR jumper", 11, "#fff", "middle")
+s.text(X0 + BW / 2, Y0 + 190, "Adafruit Motor Shield v1", 16, "#fff", "middle", "bold")
+s.text(X0 + BW / 2, Y0 + 209, "stacked on Arduino Uno R3", 13, "#cfe0f5", "middle")
+s.rect(X0 + 40, Y0 + 245, 50, 22, fill="#222", stroke="#000", rx=2)
+s.text(X0 + 65, Y0 + 237, "PWR jumper", 11, "#fff", "middle")
 s.rect(X0 + 40, Y0 - 22, 44, 30, fill="#cfcfcf", stroke="#555", rx=3)                   # USB-B on Uno
 s.text(X0 + 62, Y0 - 30, "USB → PC (upload + Serial 9600)", 11, "#333", "middle")
 
@@ -40,9 +40,18 @@ for lab, y in (("M3", 380), ("M3", 405), ("M4", 585), ("M4", 610)):
 for lab, x in (("−", 880), ("+5V", 905), ("S", 930)):
     edge_pin(x, Y0, lab, "top")
 s.text(905, Y0 + 44, "SERVO_1 (D10)", 11, "#cfe0f5", "middle")
-# analog/power row (bottom edge)
-for lab, x in (("5V", 780), ("GND", 810), ("A0", 840), ("A1", 870), ("A2", 900), ("A3", 930)):
-    edge_pin(x, Y0 + BH, lab, "bottom")
+# A0-A5 3-row header on the shield (signal / 5V / GND), servo-style: sensor plugs in with female jumpers
+COLS = {f"A{i}": 780 + i * 30 for i in range(6)}
+HS, H5, HG = 575, 600, 625
+s.rect(752, 556, 196, 86, fill="#122a4a", stroke="#0a1a30", sw=1.5, rx=6)
+s.text(850, 653 - 2, "", 1)
+for i, (k, x) in enumerate(COLS.items()):
+    s.text(x, 552, k, 10, "#fff", "middle", "bold")
+    for yy, f in ((HS, "#d4af37"), (H5, "#d62828"), (HG, "#222")):
+        s.rect(x - 7, yy - 7, 14, 14, fill=f, stroke="#000", sw=1, rx=2)
+for lab, yy in (("S", HS), ("5V", H5), ("G", HG)):
+    s.text(745, yy + 4, lab, 10, "#cfe0f5", "end")
+
 # external power terminal (bottom edge)
 for lab, x in (("+", 580), ("−", 610)):
     edge_pin(x, Y0 + BH, lab, "bottom")
@@ -91,14 +100,14 @@ s.wire([(905, 212), (905, Y0)], "red", 4)
 s.wire([(930, 212), (930, Y0)], "orange", 4)
 
 # HC-SR04 → bottom row, routed around the left side of the board
-s.wire([(610, 180), (610, 250), (470, 250), (470, 705), (780, 705), (780, Y0 + BH)], "red", 4,
-       "VCC → 5V", (520, 705))
-s.wire([(645, 180), (645, 262), (455, 262), (455, 720), (840, 720), (840, Y0 + BH)], "yellow", 4,
-       "Trig → A0", (640, 720))
-s.wire([(680, 180), (680, 274), (440, 274), (440, 735), (870, 735), (870, Y0 + BH)], "green", 4,
-       "Echo → A1", (760, 735))
-s.wire([(715, 180), (715, 286), (425, 286), (425, 750), (810, 750), (810, Y0 + BH)], "black", 4,
-       "GND → GND", (520, 750))
+s.wire([(610, 180), (610, 250), (470, 250), (470, 705), (900, 705), (900, H5)], "red", 4,
+       "VCC → 5V row", (520, 705))
+s.wire([(645, 180), (645, 262), (455, 262), (455, 720), (780, 720), (780, HS)], "yellow", 4,
+       "Trig → A0 S", (640, 720))
+s.wire([(680, 180), (680, 274), (440, 274), (440, 735), (810, 735), (810, HS)], "green", 4,
+       "Echo → A1 S", (700, 735))
+s.wire([(715, 180), (715, 286), (425, 286), (425, 750), (930, 750), (930, HG)], "black", 4,
+       "GND → GND row", (520, 750))
 
 # ---------------- battery ----------------
 s.rect(470, 830, 230, 70, fill="#333", stroke="#000", sw=2, rx=8)
@@ -118,19 +127,19 @@ s.text(NX + 227, NY + 62, "ESP-12", 12, "#333", "middle", "bold")
 s.text(NX + 85, NY + 62, "NodeMCU", 15, "#fff", "middle", "bold")
 s.text(NX + 85, NY + 80, "ESP8266 · WiFi", 11, "#bbb", "middle")
 s.rect(NX - 18, NY + 40, 22, 30, fill="#ccc", stroke="#555", rx=3)
-s.text(NX + 150, NY + 135, "NodeMCU (top pins shown)", 12, "#333", "middle")
+s.text(NX + 150, NY + 135, "Vin, GND: top row · D5, D6: bottom row", 12, "#333", "middle")
 NP = {"Vin": NX + 40, "GND": NX + 70, "D5": NX + 100, "D6": NX + 130, "GND2": NX + 160}
 for lab, x in NP.items():
     s.pin(x, NY)
     s.text(x, NY + 24, "GND" if lab == "GND2" else lab, 10, "#fff", "middle")
 
 BY = Y0 + BH
-s.wire([(780, 705), (780, 800), (NP["Vin"], 800), (NP["Vin"], NY)], "red", 4, "5V → Vin", (900, 800))
-s.circle(780, 705, 5, fill="#d62828", stroke="#000", sw=1)
-s.wire([(810, 750), (810, 785), (NP["GND"], 785), (NP["GND"], NY)], "black", 4)
-s.circle(810, 750, 5, fill="#222", stroke="#000", sw=1)
+s.wire([(900, 705), (900, 800), (NP["Vin"], 800), (NP["Vin"], NY)], "red", 4, "5V → Vin", (980, 800))
+s.circle(900, 705, 5, fill="#d62828", stroke="#000", sw=1)
+s.wire([(930, 750), (930, 785), (NP["GND"], 785), (NP["GND"], NY)], "black", 4)
+s.circle(930, 750, 5, fill="#222", stroke="#000", sw=1)
 # Uno A3 (TX, 5 V) -> 1k -> node -> D5 ; node -> 2k -> GND  (5 V -> 3.3 V)
-s.wire([(930, BY), (930, 680), (NP["D5"], 680), (NP["D5"], 715)], "purple", 4, "A3 TX → D5", (1010, 680))
+s.wire([(COLS["A3"], HS), (COLS["A3"], 680), (NP["D5"], 680), (NP["D5"], 715)], "purple", 4, "A3 S (TX) → D5", (1020, 680))
 s.wire([(NP["D5"], 755), (NP["D5"], NY)], "purple", 4)
 s.rect(NP["D5"] - 8, 715, 16, 40, fill="#e8d4a8", stroke="#7a5a1e", sw=1.5, rx=4)
 s.text(NP["D5"] - 14, 740, "1kΩ", 11, "#333", "end")
@@ -139,11 +148,12 @@ s.rect(NP["D5"] + 20, 763, 40, 14, fill="#e8d4a8", stroke="#7a5a1e", sw=1.5, rx=
 s.text(NP["D5"] + 40, 795, "2kΩ", 11, "#333", "middle")
 s.circle(NP["D5"], 770, 5, fill="#8a3ffc", stroke="#000", sw=1)
 s.wire([(NP["GND2"] + 40, 770), (NP["GND2"] + 40, 820), (NP["GND2"], 820), (NP["GND2"], NY)], "black", 3)
-s.wire([(900, BY), (900, 695), (1215, 695), (1215, 815), (NP["D6"], 815), (NP["D6"], NY)], "cyan", 4,
-       "A2 RX ← D6", (1300, 695))
+s.wire([(COLS["A2"], HS), (COLS["A2"], 692), (1215, 692), (1215, 815), (NP["D6"], 815), (NP["D6"], NY)], "cyan", 4,
+       "A2 S (RX) ← D6", (1300, 692))
 
 s.legend_box(40, 1000, 1420, [
     "• Motors M1/M2 = left, M3/M4 = right. Sensor Trig A0, Echo A1 (NewPing). Servo on SERVO_1 = D10.",
+    "• Everything plugs into the shield's A0–A5 3-row header (S = signal / 5V / GND) with female jumpers, no soldering.",
     "• WiFi bridge: Uno A2 (RX) ← NodeMCU D6 (3.3 V is fine). Uno A3 (TX, 5 V) → 1kΩ → D5, with 2kΩ from D5 to GND (keeps D5 at ~3.3 V).",
     "• NodeMCU Vin ← Uno 5V, GND ↔ GND. Upload to the NodeMCU over its own USB; it can stay wired to the Uno.",
     "• USB alone can NOT run the motors. PWR jumper ON: battery powers motors + Uno (+ NodeMCU).",

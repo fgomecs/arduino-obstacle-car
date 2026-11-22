@@ -85,10 +85,10 @@ Two sketches:
 ### Extra wiring
 | From | To |
 |---|---|
-| NodeMCU **D6** | Uno **A2** (direct) |
-| Uno **A3** | **1 kΩ** → NodeMCU **D5**, plus **2 kΩ** from D5 to GND (5 V → 3.3 V) |
-| NodeMCU **Vin** | Uno **5V** |
-| NodeMCU **GND** | Uno **GND** |
+| NodeMCU **D6** (bottom row) | header **A2 S** (direct) |
+| header **A3 S** | **1 kΩ** → NodeMCU **D5** (bottom row), plus **2 kΩ** from D5 to GND (5 V → 3.3 V) |
+| NodeMCU **Vin** (top row) | header **5V** row |
+| NodeMCU **GND** (top row) | header **GND** row |
 
 ### Setting up the NodeMCU (once)
 1. Arduino IDE → File → Preferences → Additional Boards Manager URLs: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
