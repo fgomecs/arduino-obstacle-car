@@ -2,7 +2,7 @@
 // Board: Arduino Uno R3 + Adafruit Motor Shield v1 (L293D), 4 DC motors, SG90 servo, HC-SR04
 // Libraries: "Adafruit Motor Shield library" (AFMotor, v1), "NewPing", Servo + SoftwareSerial (built-in)
 //
-// Same driving logic as v2, plus a second serial link on A2/A3 to the NodeMCU ESP8266 bridge
+// Same driving logic as v2, plus a second serial link to the NodeMCU ESP8266 bridge
 // (esp8266_bridge/). The phone web page sends the same one-letter commands:
 //      a = auto   m = manual   f = forward   b = back   l = left   r = right   s = stop
 //
@@ -12,6 +12,10 @@
 //
 // Status line to the bridge every 300 ms:  S,<A|M>,<F|B|T|X>,<cm>
 //   mode A=auto M=manual, motion F=fwd B=back T=turning X=stopped, distance in cm
+//
+// Wiring, no soldering: the shield's unused SERVO_2 header (pin D9) carries the commands.
+//   SERVO_2  S  -> NodeMCU D6        SERVO_2  +  -> NodeMCU Vin        SERVO_2  -  -> NodeMCU GND
+// Optional return wire (distance/mode on the phone): A3 -> 1k -> NodeMCU D5, 2k from D5 to GND.
 
 #include <AFMotor.h>
 #include <Servo.h>
@@ -21,8 +25,8 @@
 // ---------- Pins / hardware ----------
 #define TRIG_PIN      A0
 #define ECHO_PIN      A1
-#define BRIDGE_RX     A2      // <- NodeMCU D6 (TX, 3.3 V is fine for the Uno)
-#define BRIDGE_TX     A3      // -> NodeMCU D5 (RX) THROUGH a 1k/2k voltage divider
+#define BRIDGE_RX     9       // SERVO_2 signal pin <- NodeMCU D6 (3.3 V is fine for the Uno)
+#define BRIDGE_TX     A3      // optional -> NodeMCU D5 THROUGH a 1k/2k voltage divider
 #define SERVO_PIN     10      // SERVO_1 header on the shield
 #define MAX_DISTANCE  300     // cm
 

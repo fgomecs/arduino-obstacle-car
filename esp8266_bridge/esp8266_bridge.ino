@@ -10,8 +10,9 @@
 //  - Change WiFi later: hold the FLASH button 3 s, or use "Change WiFi" on the page.
 //  - Over-the-air updates: Arduino IDE > Tools > Port > "tiagocar at ..." (password below).
 //
-// Wiring (see README):  NodeMCU D5 <- divider <- Uno A3,  NodeMCU D6 -> Uno A2,
-//                       NodeMCU Vin <- Uno 5V,  GND <-> GND
+// Wiring (see README), no soldering - the motor shield's spare SERVO_2 header:
+//   NodeMCU D6 -> SERVO_2 S (Uno D9)    NodeMCU Vin -> SERVO_2 +    NodeMCU GND -> SERVO_2 -
+// Optional return wire for distance on the phone: Uno A3 -> 1k -> D5, 2k from D5 to GND.
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
@@ -23,8 +24,8 @@
 #define HOSTNAME     "tiagocar"
 #define SETUP_AP     "TiagoCar-Setup"
 #define OTA_PASSWORD "tiagocar"     // change if you like
-#define UNO_RX       D5             // receives from Uno A3 (through the divider)
-#define UNO_TX       D6             // sends to Uno A2
+#define UNO_RX       D5             // optional: receives from Uno A3 (through the divider)
+#define UNO_TX       D6             // sends to Uno D9 (SERVO_2 signal pin)
 #define FLASH_BTN    0              // on-board FLASH button (GPIO0), active LOW
 #define LED_PIN      LED_BUILTIN    // blue LED on the ESP module, active LOW
 
@@ -124,8 +125,9 @@ async function poll(){
   $('bar').style.background=s.dist<30?'var(--bad)':s.dist<60?'var(--warn)':'var(--ok)';
   $('mot').textContent={F:'driving',B:'reversing',T:'turning',X:'stopped'}[s.motion]||'';
   $('mA').classList.toggle('sel',mode==='A');$('mM').classList.toggle('sel',mode==='M');
-  const fresh=s.age<2000;$('conn').textContent=fresh?'connected':'car not answering';
-  $('conn').className='pill '+(fresh?'on':'off');
+  const fresh=s.age<2000;$('conn').textContent=fresh?'connected':'connected · no feedback wire';
+  $('conn').className='pill '+(fresh?'on':'');
+  if(!fresh){$('d').textContent='--';$('bar').style.width='0';$('mot').textContent='';}
  }catch(e){$('conn').textContent='offline';$('conn').className='pill off';}
  setTimeout(poll,300);}
 poll();
