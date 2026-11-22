@@ -3,7 +3,7 @@ from svglib import SVG
 
 s = SVG(1500, 960)
 s.title("Obstacle-avoiding car · wiring",
-        "Arduino Uno R3 + Adafruit Motor Shield v1 (L293D) · 4 DC motors · SG90 servo · HC-SR04 ultrasonic sensor")
+        "Arduino Uno R3 + MII motor shield (Adafruit v1 clone, L293D) · 4 DC motors · SG90 servo · HC-SR04 ultrasonic sensor")
 
 # ---------------- board (Uno with shield stacked on top) ----------------
 X0, Y0, BW, BH = 520, 330, 460, 330
@@ -13,7 +13,7 @@ s.rect(X0 + 150, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)            
 s.rect(X0 + 250, Y0 + 120, 80, 50, fill="#111", stroke="#000", rx=3)
 s.text(X0 + 190, Y0 + 150, "L293D", 11, "#ddd", "middle")
 s.text(X0 + 290, Y0 + 150, "L293D", 11, "#ddd", "middle")
-s.text(X0 + BW / 2, Y0 + 180, "Adafruit Motor Shield v1", 16, "#fff", "middle", "bold")
+s.text(X0 + BW / 2, Y0 + 180, "MII motor shield (Adafruit v1 clone)", 15, "#fff", "middle", "bold")
 s.text(X0 + BW / 2, Y0 + 199, "stacked on Arduino Uno R3", 13, "#cfe0f5", "middle")
 s.rect(X0 + 40, Y0 + 245, 50, 22, fill="#222", stroke="#000", rx=2)
 s.text(X0 + 65, Y0 + 237, "PWR jumper", 11, "#fff", "middle")
