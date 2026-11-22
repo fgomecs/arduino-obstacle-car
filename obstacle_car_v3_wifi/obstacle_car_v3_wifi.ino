@@ -13,8 +13,10 @@
 // Status line to the bridge every 300 ms:  S,<A|M>,<F|B|T|X>,<cm>
 //   mode A=auto M=manual, motion F=fwd B=back T=turning X=stopped, distance in cm
 //
-// Wiring, no soldering: the shield's unused SERVO_2 header (pin D9) carries the commands.
-//   SERVO_2  S  -> NodeMCU D6        SERVO_2  +  -> NodeMCU Vin        SERVO_2  -  -> NodeMCU GND
+// Wiring, no soldering: the servo is on the SERVO_2 header, the NodeMCU uses the free SER1 header.
+//   SER1  S  -> NodeMCU D6        SER1  +  -> NodeMCU Vin        SER1  -  -> NodeMCU GND
+// On power-up the sensor head wiggles left-right. If it does NOT move, your shield has the
+// two headers' pins swapped: set SWAP_SERVO_PINS to 1 below and upload again.
 // Optional return wire (distance/mode on the phone): A3 -> 1k -> NodeMCU D5, 2k from D5 to GND.
 
 #include <AFMotor.h>
@@ -25,9 +27,15 @@
 // ---------- Pins / hardware ----------
 #define TRIG_PIN      A0
 #define ECHO_PIN      A1
-#define BRIDGE_RX     9       // SERVO_2 signal pin <- NodeMCU D6 (3.3 V is fine for the Uno)
+#define SWAP_SERVO_PINS 0     // 0 = standard labels (SERVO_2 = D9, SER1 = D10). 1 = swapped.
+#if SWAP_SERVO_PINS
+#define SERVO_PIN     10
+#define BRIDGE_RX     9
+#else
+#define SERVO_PIN     9       // SERVO_2 header (servo plugged in here)
+#define BRIDGE_RX     10      // SER1 header signal pin <- NodeMCU D6 (3.3 V is fine for the Uno)
+#endif
 #define BRIDGE_TX     A3      // optional -> NodeMCU D5 THROUGH a 1k/2k voltage divider
-#define SERVO_PIN     10      // SERVO_1 header on the shield
 #define MAX_DISTANCE  300     // cm
 
 // ---------- Tuning ----------
@@ -217,8 +225,13 @@ void setup() {
   Serial.begin(9600);
   bridge.begin(9600);
   eyes.attach(SERVO_PIN);
-  eyes.write(LOOK_CENTER);
   moveStop();
+  // Boot wiggle: proves the servo pin is right (no movement -> set SWAP_SERVO_PINS 1)
+  eyes.write(60);  delay(350);
+  eyes.write(120); delay(450);
+  eyes.write(LOOK_CENTER);
+  Serial.print(F("Servo on D")); Serial.print(SERVO_PIN);
+  Serial.print(F(", WiFi bridge on D")); Serial.println(BRIDGE_RX);
   Serial.println(F("Car v3 ready. a=auto m=manual f/b/l/r/s (USB or WiFi bridge)"));
   delay(2000);   // time to set it on the floor
 }

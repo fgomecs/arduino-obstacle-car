@@ -79,21 +79,23 @@ Auto mode prints `DIST <cm>` twice a second and `SCAN L=.. R=..` on each avoidan
 ![Wiring with WiFi bridge](docs/wiring-wifi.png)
 
 Two sketches:
-- `obstacle_car_v3_wifi/` goes on the **Uno**. It's v2 plus a second serial link (commands in on D9 / SERVO_2, optional status out on A3) and a safety stop.
+- `obstacle_car_v3_wifi/` goes on the **Uno**. It's v2 plus a second serial link (commands in on the SER1 header, optional status out on A3) and a safety stop.
 - `esp8266_bridge/` goes on the **NodeMCU**. It handles WiFi setup, the phone web page, and over-the-air updates.
 
 ### Extra wiring (no soldering)
-Use 3 female-to-female jumpers to the shield's **spare servo header** (the empty one of the two, **SERVO_2 = D9**):
+The servo is on the **SERVO_2** header. The NodeMCU uses the free **SER1** header next to it, with 3 female-to-female jumpers:
 
-| NodeMCU | SERVO_2 header |
+| NodeMCU | SER1 header |
 |---|---|
-| **D6** (bottom row) | **S** (Uno D9) |
+| **D6** (bottom row) | **S** |
 | **Vin** (top row) | **+** (5 V) |
 | **GND** (top row) | **−** |
 
-**Optional return wire** (shows distance and mode on the phone): Uno **A3** → **1 kΩ** → NodeMCU **D5**, plus **2 kΩ** from D5 to GND. Without it, driving works and the page shows "connected · no feedback wire".
+**Check the servo pin:** on power-up the sensor head wiggles left and right, and the Serial Monitor prints `Servo on D9, WiFi bridge on D10`.
+- If the head **doesn't move**, this shield has the two headers' pins swapped. Set `SWAP_SERVO_PINS 1` at the top of `obstacle_car_v3_wifi.ino` and upload again.
+- The standard layout for this shield design is SERVO_2 = D9, SER1 = D10.
 
-If the servo stops sweeping after you plug in the NodeMCU, the two headers are swapped on your board. Swap the plugs.
+**Optional return wire** (shows distance and mode on the phone): Uno **A3** → **1 kΩ** → NodeMCU **D5**, plus **2 kΩ** from D5 to GND. Without it, driving works and the page shows "connected · no feedback wire".
 
 ### Setting up the NodeMCU (once)
 1. Arduino IDE → File → Preferences → Additional Boards Manager URLs: `http://arduino.esp8266.com/stable/package_esp8266com_index.json`
@@ -137,5 +139,5 @@ If the servo stops sweeping after you plug in the NodeMCU, the two headers are s
 An ESP32 (about $10) acts as a WiFi bridge:
 - It hosts a phone web page: drive pad, auto/manual toggle, live distance readout.
 - It uses WiFiManager: if the home WiFi changes, join the car's own setup hotspot from a phone and pick the new network. No reflashing.
-- It sends the same one-letter commands to the Uno over SoftwareSerial on D9 (the spare SERVO_2 header).
+- It sends the same one-letter commands to the Uno over SoftwareSerial through the free SER1 servo header.
 - The Uno TX → ESP32 RX line needs a 5 V → 3.3 V divider.

@@ -10,8 +10,8 @@
 //  - Change WiFi later: hold the FLASH button 3 s, or use "Change WiFi" on the page.
 //  - Over-the-air updates: Arduino IDE > Tools > Port > "tiagocar at ..." (password below).
 //
-// Wiring (see README), no soldering - the motor shield's spare SERVO_2 header:
-//   NodeMCU D6 -> SERVO_2 S (Uno D9)    NodeMCU Vin -> SERVO_2 +    NodeMCU GND -> SERVO_2 -
+// Wiring (see README), no soldering - the motor shield's free SER1 servo header:
+//   NodeMCU D6 -> SER1 S    NodeMCU Vin -> SER1 +    NodeMCU GND -> SER1 -
 // Optional return wire for distance on the phone: Uno A3 -> 1k -> D5, 2k from D5 to GND.
 
 #include <ESP8266WiFi.h>
@@ -25,7 +25,7 @@
 #define SETUP_AP     "TiagoCar-Setup"
 #define OTA_PASSWORD "tiagocar"     // change if you like
 #define UNO_RX       D5             // optional: receives from Uno A3 (through the divider)
-#define UNO_TX       D6             // sends to Uno D9 (SERVO_2 signal pin)
+#define UNO_TX       D6             // sends to the Uno via the SER1 header signal pin
 #define FLASH_BTN    0              // on-board FLASH button (GPIO0), active LOW
 #define LED_PIN      LED_BUILTIN    // blue LED on the ESP module, active LOW
 
