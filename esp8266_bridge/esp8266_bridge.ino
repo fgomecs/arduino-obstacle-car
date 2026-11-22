@@ -194,6 +194,7 @@ void setup() {
   digitalWrite(LED_PIN, LOW);             // LED on while connecting
 
   WiFi.mode(WIFI_STA);
+  WiFi.setOutputPower(10);                // lower TX power: avoids brown-out resets on cheap boards/USB
   WiFi.hostname(HOSTNAME);
   WiFiManager wm;
   wm.setConfigPortalTimeout(300);         // 5 min in setup mode, then retry
@@ -203,6 +204,7 @@ void setup() {
     Serial.println(F("No WiFi configured, restarting"));
     ESP.restart();
   }
+  WiFi.setAutoReconnect(true);
   digitalWrite(LED_PIN, HIGH);            // LED off = connected
   Serial.print(F("Connected. Open http://" HOSTNAME ".local or http://"));
   Serial.println(WiFi.localIP());
